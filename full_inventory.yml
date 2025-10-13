@@ -1,0 +1,27 @@
+---
+- name: Generate Full AWS Inventory from All Configured Profiles
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    aws_config_file: "/home/ubuntu/.aws/config"
+    aws_region: "us-east-1"
+    output_csv_file: "./full_inventory.csv"
+    
+    dynamic_aws_profiles: "{{ lookup('file', aws_config_file) | regex_findall('^\\[profile\\s+([^\\]]+)\\]', multiline=True) }}"
+
+  tasks:
+    - name: 1. Create CSV file with header (runs only once)
+      ansible.builtin.copy:
+        dest: "{{ output_csv_file }}"
+        content: "AccountId,AccountName,InstanceName,InstanceId,Type,PrivateIp,State,LaunchTime"
+        mode: '0644'
+        force: yes
+      run_once: true
+
+    - name: 2. Process each AWS profile by including the tasks file
+      ansible.builtin.include_tasks: process_one_account.yml
+      loop: "{{ dynamic_aws_profiles }}"
+      loop_control:
+        loop_var: current_profile
