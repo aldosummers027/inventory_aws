@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         VENV_PATH = "/home/ubuntu/ansible_venv/bin/activate"
-        PLAYBOOK_NAME = "generar_reporte_avanzado.yml" 
+        PLAYBOOK_NAME = "full_inventory.yml" 
         OUTPUT_CSV_FILE = "inventario_aws.csv"
     }
 
