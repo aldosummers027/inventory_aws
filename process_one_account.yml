@@ -3,19 +3,14 @@
 
 - name: "Get account alias for profile: {{ current_profile }} using AWS CLI"
   ansible.builtin.shell:
-    # Construimos el comando de la CLI con el perfil actual
     cmd: "aws iam list-account-aliases --profile {{ current_profile }}"
   register: account_alias_cli
   ignore_errors: true
-  # 'changed_when: false' le dice a Ansible que este comando, aunque se ejecute, no está "cambiando" el estado del sistema.
   changed_when: false
 
 - name: "Set account name fact"
   ansible.builtin.set_fact:
-    # Usamos el filtro 'from_json' para leer la salida de la CLI.
-    # Si la lista de alias existe y no está vacía, tomamos el primer elemento. Si no, 'N/A'.
     account_name: "{{ (account_alias_cli.stdout | from_json).AccountAliases[0] if (account_alias_cli.stdout | from_json).AccountAliases else 'N/A' }}"
-  # Solo ejecuta esta tarea si el comando anterior no falló
   when: account_alias_cli is not failed
 
 - name: "Fetching EC2 instances for profile: {{ current_profile }}"

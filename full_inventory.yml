@@ -7,7 +7,7 @@
   vars:
     aws_config_file: "/home/ubuntu/.aws/config"
     aws_region: "us-east-1"
-    output_csv_file: "./full_inventory.csv"
+    output_csv_file: "{{ output_csv_file }}"
     
     dynamic_aws_profiles: "{{ lookup('file', aws_config_file) | regex_findall('^\\[profile\\s+([^\\]]+)\\]', multiline=True) }}"
 
